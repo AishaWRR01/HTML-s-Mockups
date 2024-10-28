@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Previous styles remain identical */
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8fafc;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      background-color: #1e40af;
+      color: white;
+      padding: 24px;
+      border-radius: 8px 8px 0 0;
+    }
+    
+    .rate-card {
+      background: white;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      padding: 24px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e40af;
+      margin: 24px 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .role-select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      margin-bottom: 24px;
+      font-size: 16px;
+    }
+    
+    .rate-display {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .rate-box {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .rate-label {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 8px;
+      min-height: 40px;
+    }
+    
+    .rate-value {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1e40af;
+      transition: all 0.3s ease;
+    }
+    
+    .rate-range {
+      padding: 20px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .slider-container {
+      position: relative;
+      padding: 10px 0;
+    }
+
+    .range-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 12px;
+      border-radius: 6px;
+      background: linear-gradient(to right, #93c5fd, #1e40af);
+      outline: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #1e40af;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+    }
+
+    .range-slider::-webkit-slider-thumb:hover {
+      background: #2563eb;
+      transform: scale(1.1);
+    }
+
+    .range-slider::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #1e40af;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      color: #64748b;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .client-section {
+      margin-bottom: 32px;
+    }
+
+    .rosie-section {
+      border-top: 2px solid #e2e8f0;
+      margin-top: 32px;
+      padding-top: 16px;
+    }
+
+    .slider-values {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      color: #1e40af;
+      font-weight: 500;
+    }
+
+    .current-rate {
+      text-align: center;
+      color: #1e40af;
+      font-weight: 600;
+      margin: 10px 0;
+      font-size: 18px;
+    }
+
+    .rate-box.highlight {
+      background: #e0e7ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>WRR Market Rate Card</h1>
+      <p>Effective 2024</p>
+    </div>
+    
+    <div class="rate-card">
+      <div class="section-title">WRR Role Name</div>
+      <select id="roleSelect" class="role-select" onchange="updateRates()">
+        <option value="pm">Project Manager</option>
+        <option value="sales">Sales Manager</option>
+        <option value="events">Events Director</option>
+        <option value="hr">HR Director</option>
+        <option value="seo">SEO Strategist</option>
+      </select>
+
+      <div class="client-section">
+        <div class="section-title">Client Market Rates</div>
+        <div class="rate-display">
+          <div class="rate-box">
+            <div class="rate-label">MIN Market Rate - Client</div>
+            <div class="rate-value" id="clientMinRate">$75.00</div>
+          </div>
+          <div class="rate-box">
+            <div class="rate-label">MAX Market Rate - Client</div>
+            <div class="rate-value" id="clientMaxRate">$125.00</div>
+          </div>
+          <div class="rate-box">
+            <div class="rate-label">Market Rate Spread</div>
+            <div class="rate-value" id="clientSpread">$50.00</div>
+          </div>
+        </div>
+        
+        <div class="rate-range">
+          <h3>Client Rate Adjustment</h3>
+          <div class="slider-container">
+            <input type="range" 
+                   class="range-slider" 
+                   id="clientSlider" 
+                   value="75"
+                   oninput="updateClientRates(this.value)">
+          </div>
+          <div class="range-labels">
+            <span>Base</span>
+            <span>Maximum</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rosie-section">
+        <div class="section-title">Rosie Market Rates</div>
+        <div class="rate-display">
+          <div class="rate-box">
+            <div class="rate-label">MIN Market Rate - Rosie</div>
+            <div class="rate-value" id="rosieMinRate">$50.00</div>
+          </div>
+          <div class="rate-box">
+            <div class="rate-label">MAX Market Rate - Rosie</div>
+            <div class="rate-value" id="rosieMaxRate">$75.00</div>
+          </div>
+          <div class="rate-box">
+            <div class="rate-label">Market Rate Spread</div>
+            <div class="rate-value" id="rosieSpread">$25.00</div>
+          </div>
+        </div>
+        
+        <div class="rate-range">
+          <h3>Rosie Rate Adjustment</h3>
+          <div class="slider-container">
+            <input type="range" 
+                   class="range-slider" 
+                   id="rosieSlider" 
+                   value="50"
+                   oninput="updateRosieRates(this.value)">
+          </div>
+          <div class="range-labels">
+            <span>Base</span>
+            <span>Maximum</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const rateData = {
+      pm: {
+        rosie: {
+          baseMin: 50.00,
+          baseMax: 75.00,
+        },
+        client: {
+          baseMin: 75.00,
+          baseMax: 125.00,
+        }
+      },
+      sales: {
+        rosie: {
+          baseMin: 60.00,
+          baseMax: 85.00,
+        },
+        client: {
+          baseMin: 85.00,
+          baseMax: 140.00,
+        }
+      },
+      events: {
+        rosie: {
+          baseMin: 65.00,
+          baseMax: 90.00,
+        },
+        client: {
+          baseMin: 90.00,
+          baseMax: 150.00,
+        }
+      },
+      hr: {
+        rosie: {
+          baseMin: 55.00,
+          baseMax: 80.00,
+        },
+        client: {
+          baseMin: 80.00,
+          baseMax: 135.00,
+        }
+      },
+      seo: {
+        rosie: {
+          baseMin: 70.00,
+          baseMax: 95.00,
+        },
+        client: {
+          baseMin: 95.00,
+          baseMax: 160.00,
+        }
+      }
+    };
+
+    function updateClientRates(value) {
+      const role = document.getElementById('roleSelect').value;
+      const baseMin = rateData[role].client.baseMin;
+      const baseMax = rateData[role].client.baseMax;
+      const baseSpread = baseMax - baseMin;
+      
+      // Calculate percentage of slider progress
+      const sliderRange = baseMax - baseMin;
+      const percentage = (value - baseMin) / sliderRange;
+      
+      // Calculate new min and max rates
+      const newMin = baseMin + (percentage * 25); // Allows min to increase up to $25
+      const newMax = parseFloat(value) + baseSpread;
+      const newSpread = newMax - newMin;
+      
+      // Update display values
+      document.getElementById('clientMinRate').textContent = `$${newMin.toFixed(2)}`;
+      document.getElementById('clientMaxRate').textContent = `$${newMax.toFixed(2)}`;
+      document.getElementById('clientSpread').textContent = `$${newSpread.toFixed(2)}`;
+    }
+
+    function updateRosieRates(value) {
+      const role = document.getElementById('roleSelect').value;
+      const baseMin = rateData[role].rosie.baseMin;
+      const baseMax = rateData[role].rosie.baseMax;
+      const baseSpread = baseMax - baseMin;
+      
+      // Calculate percentage of slider progress
+      const sliderRange = baseMax - baseMin;
+      const percentage = (value - baseMin) / sliderRange;
+      
+      // Calculate new min and max rates
+      const newMin = baseMin + (percentage * 15); // Allows min to increase up to $15
+      const newMax = parseFloat(value) + baseSpread;
+      const newSpread = newMax - newMin;
+      
+      // Update display values
+      document.getElementById('rosieMinRate').textContent = `$${newMin.toFixed(2)}`;
+      document.getElementById('rosieMaxRate').textContent = `$${newMax.toFixed(2)}`;
+      document.getElementById('rosieSpread').textContent = `$${newSpread.toFixed(2)}`;
+    }
+
+    function updateRates() {
+      const role = document.getElementById('roleSelect').value;
+      const { rosie, client } = rateData[role];
+      
+      // Update Client slider
+      const clientSlider = document.getElementById('clientSlider');
+      clientSlider.min = client.baseMin;
+      clientSlider.max = client.baseMax;
+      clientSlider.value = client.baseMin;
+      clientSlider.step = 5;
+      updateClientRates(client.baseMin);
+      
+      // Update Rosie slider
+      const rosieSlider = document.getElementById('rosieSlider');
+      rosieSlider.min = rosie.baseMin;
+      rosieSlider.max = rosie.baseMax;
+      rosieSlider.value = rosie.baseMin;
+      rosieSlider.step = 5;
+      updateRosieRates(rosie.baseMin);
+    }
+
+    // Initialize on page load
+    updateRates();
+  </script>
+</body>
+</html>
